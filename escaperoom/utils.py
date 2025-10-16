@@ -1,0 +1,70 @@
+import base64
+import json
+import ipaddress
+import os
+
+B64_CHARS = set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=")
+
+
+def parse_kv_file(path: str) -> dict[str, str]:
+    kv: dict[str, str] = {}
+    if not os.path.exists(path):
+        return kv
+    with open(path, "r", encoding="utf-8") as f:
+        for raw in f:
+            line = raw.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            k, v = line.split("=", 1)
+            kv[k.strip().lower()] = v.strip()
+    return kv
+
+
+def b64_decode(s: str) -> str:
+    cleaned = "".join(
+        ch
+        for ch in s.replace("\\", "").replace(" ", "").replace("\t", "")
+        if ch in B64_CHARS
+    )
+    if len(cleaned) % 4 != 0:
+        cleaned += "=" * (4 - (len(cleaned) % 4))
+    try:
+        return base64.b64decode(cleaned, validate=False).decode(
+            "utf-8", errors="ignore"
+        )
+    except Exception:
+        return ""
+
+
+def read_jsonl(path: str) -> list[dict]:
+    """
+    Reads JSON-lines; skips malformed lines gracefully.
+    """
+    items: list[dict] = []
+    with open(path, "r", encoding="utf-8") as f:
+        for raw in f:
+            line = raw.strip()
+            if not line:
+                continue
+            try:
+                items.append(json.loads(line))
+            except Exception:
+                # fail gracefully
+                continue
+    return items
+
+
+def ipv4_in_cidr(ip: str, cidr: str) -> bool:
+    try:
+        return ipaddress.IPv4Address(ip) in ipaddress.IPv4Network(cidr, strict=False)
+    except Exception:
+        return False
+
+
+def ipv4_cidr24(ip: str) -> str:
+    """
+    Returns the /24 CIDR string for a valid IPv4, or raises if invalid.
+    """
+    addr = ipaddress.IPv4Address(ip)
+    net = ipaddress.IPv4Network(f"{addr}/24", strict=False)
+    return f"{net.network_address}/24"

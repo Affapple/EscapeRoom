@@ -39,3 +39,9 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Ignore game files
+*.log
+*.json
+*.cfg
+*.txt
