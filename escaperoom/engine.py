@@ -6,6 +6,7 @@ import json
 import os
 from escaperoom.transcript import Transcript
 from escaperoom.rooms.base import Room
+from escaperoom.utils import parse_kv_file
 
 
 @dataclass
@@ -59,7 +60,7 @@ class Engine:
         while self.running:
             try:
                 room_key = self.state.current_room
-                room = self.current_room_obj()
+                room = self._current_room_obj()
                 room_title = room.name if room else "Unknown"
                 line = input(f"[{room_key}: {room_title}]> ").strip()
             except (EOFError, KeyboardInterrupt):
@@ -81,7 +82,7 @@ class Engine:
         else:
             print("Unknown command. Try 'help'.")
 
-    def current_room_obj(self) -> Optional[Room]:
+    def _current_room_obj(self) -> Optional[Room]:
         return self.rooms.get(self.state.current_room)
 
     def resolve_room(self, token: str) -> Optional[Room]:
@@ -93,7 +94,6 @@ class Engine:
         return self.rooms.get(room_name)
 
     # Commands
-
     def cmd_help(self, _: str):
         print(
             "Commands: look, rooms, move <room|#>, inspect <item>, use <item>, "
@@ -108,7 +108,7 @@ class Engine:
         print("Use 'move <name>' or 'move <number>' to enter.")
 
     def cmd_look(self, _: str):
-        room = self.current_room_obj()
+        room = self._current_room_obj()
         if room:
             print(f"You are in the {room.name}.")
             print(room.description)
@@ -130,7 +130,7 @@ class Engine:
 
     def cmd_inspect(self, arg: str):
         item = arg.strip()
-        room = self.current_room_obj()
+        room = self._current_room_obj()
         if not room:
             print("No room is active.")
             return
@@ -142,7 +142,6 @@ class Engine:
     def cmd_use(self, arg: str):
         tool = arg.strip().lower()
         if self.state.current_room == "final" and tool in ("gate", "final", "console"):
-            # Friendly heads-up about collected tokens
             ordered = ", ".join(
                 f"{k}={self.state.tokens.get(k, '?')}"
                 for k in sorted(self.state.tokens)
@@ -156,15 +155,8 @@ class Engine:
     def use_final_gate(self):
         final_path = os.path.join(self.data_dir, "final_gate.txt")
         try:
-            cfg = {}
-            with open(final_path, "r", encoding="utf-8") as f:
-                for line in f:
-                    line = line.strip()
-                    if not line or line.startswith("#"):
-                        continue
-                    if "=" in line:
-                        k, v = line.split("=", 1)
-                        cfg[k.strip().lower()] = v.strip()
+            # TODO verify if token order is necessary
+            cfg = parse_kv_file(final_path)
             token_order = [
                 t.strip()
                 for t in cfg.get("token_order", "KEYPAD,DNS,SAFE,PID").split(",")
