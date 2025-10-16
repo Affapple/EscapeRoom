@@ -20,7 +20,7 @@ def parse_kv_file(path: str) -> dict[str, str]:
     return kv
 
 
-def b64_loose_decode(s: str) -> str:
+def b64_decode(s: str) -> str:
     cleaned = "".join(
         ch
         for ch in s.replace("\\", "").replace(" ", "").replace("\t", "")
