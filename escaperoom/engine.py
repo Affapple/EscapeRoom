@@ -1,20 +1,12 @@
 from dataclasses import asdict
 from typing import Optional, Callable
-from dataclasses import dataclass, field
 
 import json
 import os
 from escaperoom.transcript import Transcript
 from escaperoom.rooms.base import Room
+from escaperoom.rooms.base import GameState
 from escaperoom.utils import parse_kv_file
-
-
-@dataclass
-class GameState:
-    current_room: str = "intro"
-    inventory: set[str] = field(default_factory=set)
-    tokens: dict[str, str] = field(default_factory=dict)
-    flags: dict[str, str] = field(default_factory=dict)
 
 
 class Engine:
