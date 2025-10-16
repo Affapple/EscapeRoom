@@ -1,4 +1,5 @@
-from escaperoom.engine import GameState, Transcript
+from escaperoom.transcript import Transcript
+from escaperoom.rooms.base import GameState
 from escaperoom.rooms.base import Room
 from escaperoom.utils import b64_decode, parse_kv_file
 import os

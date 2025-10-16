@@ -1,6 +1,6 @@
-from escaperoom.rooms.base import Room
-from escaperoom.engine import GameState
 from escaperoom.transcript import Transcript
+from escaperoom.rooms.base import GameState
+from escaperoom.rooms.base import Room
 
 
 class FinalRoom(Room):
