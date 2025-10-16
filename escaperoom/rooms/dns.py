@@ -1,5 +1,5 @@
 from escaperoom.engine import Room, GameState, Transcript
-from escaperoom.utils import b64_loose_decode
+from escaperoom.utils import b64_decode, parse_kv_file
 import os
 import string
 
@@ -15,19 +15,19 @@ class DnsRoom(Room):
             return
 
         print("[Room DNS] Decoding hints...")
-        cfg = self.__parse_cfg(self.path)
+        cfg = parse_kv_file(self.path)
         if not cfg:
             print("[Warning] dns.cfg not found or empty.")
             return
 
         tag_raw = cfg.get("token_tag", "")
-        tag_decoded = b64_loose_decode(tag_raw).strip()
+        tag_decoded = b64_decode(tag_raw).strip()
         sel_key = f"hint{tag_decoded}" if tag_decoded.isdigit() else None
         if not sel_key or sel_key not in cfg:
             print("[Warning] token_tag did not resolve to a valid hint.")
             return
 
-        decoded_line = b64_loose_decode(cfg[sel_key]).strip()
+        decoded_line = b64_decode(cfg[sel_key]).strip()
         if not decoded_line:
             print("[Warning] Selected hint did not decode.")
             return
@@ -43,16 +43,3 @@ class DnsRoom(Room):
 
         print(f'Decoded line: "{decoded_line}"')
         print(f"Token formed: {token}")
-
-    def __parse_cfg(self, path: str) -> dict[str, str]:
-        cfg: dict[str, str] = {}
-        if not os.path.exists(path):
-            return cfg
-        with open(path, "r", encoding="utf-8") as f:
-            for raw in f:
-                line = raw.strip()
-                if not line or line.startswith("#") or "=" not in line:
-                    continue
-                k, v = line.split("=", 1)
-                cfg[k.strip().lower()] = v.strip()
-        return cfg
