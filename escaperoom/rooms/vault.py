@@ -1,4 +1,5 @@
-from escaperoom.engine import Room, GameState, Transcript
+from escaperoom.engine import GameState, Transcript
+from escaperoom.rooms.base import Room
 import os
 import re
 

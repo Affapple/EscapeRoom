@@ -10,12 +10,12 @@ from escaperoom.rooms.final import FinalRoom
 
 def build_rooms(data_dir: str):
     return {
-        "intro": IntroRoom("Intro Lobby", "Doors: soc, dns, vault, malware, final"),
+        "intro": IntroRoom(),
         "soc": SocRoom(data_dir),
         "dns": DnsRoom(data_dir),
         "vault": VaultRoom(data_dir),
         "malware": MalwareRoom(data_dir),
-        "final": FinalRoom("Final Gate", "The console asks for proof."),
+        "final": FinalRoom(),
     }
 
 
