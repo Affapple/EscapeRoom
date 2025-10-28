@@ -149,7 +149,6 @@ class Engine:
     def use_final_gate(self):
         final_path = os.path.join(self.data_dir, "final_gate.txt")
         try:
-            # TODO verify if token order is necessary
             cfg = parse_kv_file(final_path)
             token_order = [
                 t.strip()
@@ -159,9 +158,7 @@ class Engine:
             expected_hmac = cfg.get("expected_hmac", "?")
         except Exception as e:
             print(f"[Warning] Could not read final_gate.txt: {e}")
-            token_order = ["KEYPAD", "DNS", "SAFE", "PID"]
-            group_id = "?"
-            expected_hmac = "?"
+            return
 
         tokens_in_order = [self.state.tokens.get(k, "?") for k in token_order]
         msg = f"{group_id}|{'-'.join(tokens_in_order)}"
