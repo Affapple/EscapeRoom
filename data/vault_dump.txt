@@ -30,7 +30,7 @@ SAFE{ 4-13-48 }
 SAFE { 27 - 3 - 39 }
 SAFE{22 - 20 - 75}
 SAFE{ 35-37-20 }
-SAFE{  5-6-11 } <<< maybe
+SAFE{  5-6-12 } <<< maybe
 SAFE { 7 - 5 - 33 }
 SAFE{ 26-3-53 }
 SAFE{ 25-2-67 }
