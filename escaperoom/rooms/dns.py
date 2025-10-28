@@ -18,18 +18,22 @@ class DnsRoom(Room):
 
         print("[Room DNS] Decoding hints...")
         cfg = parse_kv_file(self.path)
-        if not cfg:
+        if len(cfg) == 0:
             print("[Warning] dns.cfg not found or empty.")
             return
 
         tag_raw = cfg.get("token_tag", "")
-        tag_decoded = b64_decode(tag_raw).strip()
-        sel_key = f"hint{tag_decoded}" if tag_decoded.isdigit() else None
-        if not sel_key or sel_key not in cfg:
+        tag_decoded = b64_decode(tag_raw)
+        if not tag_decoded.isdigit():
             print("[Warning] token_tag did not resolve to a valid hint.")
             return
 
-        decoded_line = b64_decode(cfg[sel_key]).strip()
+        sel_key = f"hint{tag_decoded}"
+        if sel_key not in cfg:
+            print("[Warning] Selected hint key not found in config.")
+            return
+
+        decoded_line = b64_decode(cfg[sel_key])
         if not decoded_line:
             print("[Warning] Selected hint did not decode.")
             return

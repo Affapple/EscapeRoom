@@ -43,6 +43,8 @@ class Engine:
             "examine": self.cmd_inspect,
             "read": self.cmd_inspect,
             "open": self.cmd_inspect,
+            "mv": self.cmd_move,
+            "q": self.cmd_quit,
         }
         self.room_order = list(rooms.keys())
 

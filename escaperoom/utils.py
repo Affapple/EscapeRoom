@@ -33,16 +33,16 @@ def b64_decode(s: str) -> str:
     try:
         return base64.b64decode(cleaned, validate=False).decode(
             "utf-8", errors="ignore"
-        )
+        ).strip()
     except Exception:
         return ""
 
 
 def read_jsonl(path: str) -> list[dict]:
     """
-    Reads JSON-lines; skips malformed lines gracefully.
+    Reads JSON-lines; skips malformed lines
     """
-    items: list[dict] = []
+    items: list[dict[str, str | int]] = []
     with open(path, "r", encoding="utf-8") as f:
         for raw in f:
             line = raw.strip()
@@ -51,7 +51,6 @@ def read_jsonl(path: str) -> list[dict]:
             try:
                 items.append(json.loads(line))
             except Exception:
-                # fail gracefully
                 continue
     return items
 
