@@ -22,19 +22,15 @@ def parse_kv_file(path: str) -> dict[str, str]:
     return kv
 
 
-def b64_decode(s: str) -> str:
-    cleaned = "".join(
-        ch
-        for ch in s.replace("\\", "").replace(" ", "").replace("\t", "")
-        if ch in B64_CHARS
-    )
-    if len(cleaned) % 4 != 0:
-        cleaned += "=" * (4 - (len(cleaned) % 4))
+def b64_decode(msg: str) -> str:
+    if len(msg) % 4 != 0:
+        msg += "=" * (4 - (len(msg) % 4))
     try:
-        return base64.b64decode(cleaned, validate=False).decode(
+        return base64.b64decode(msg).decode(
             "utf-8", errors="ignore"
         ).strip()
-    except Exception:
+    except Exception as e:
+        print(f"[Warning] Base64 decoding failed. {e}")
         return ""
 
 

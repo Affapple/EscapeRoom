@@ -27,16 +27,20 @@ class DnsRoom(Room):
         if not tag_decoded.isdigit():
             print("[Warning] token_tag did not resolve to a valid hint.")
             return
+        print(f"[Room DNS] Hint tag id is: {tag_decoded}")
 
         sel_key = f"hint{tag_decoded}"
         if sel_key not in cfg:
             print("[Warning] Selected hint key not found in config.")
             return
+        print(f"[Room DNS] Found hint key: {sel_key}")
 
+        print(f"[Room DNS] Decoding hint line \"{cfg[sel_key]}\" ...")
         decoded_line = b64_decode(cfg[sel_key])
         if not decoded_line:
             print("[Warning] Selected hint did not decode.")
             return
+        print(f"[Room DNS] Decoded hint line: {decoded_line}")
 
         # Token: last word normalized
         last_word = decoded_line.split()[-1]
