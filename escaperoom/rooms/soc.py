@@ -21,19 +21,19 @@ class SocRoom(Room):
         print("[Room SOC] Parsing logs...")
         subnet_counts: dict[str, int] = {}
         ip_counts: dict[str, int] = {}
-        sample_line = ""
-        malformed_skipped = 0
+        sample_line: str = ""
+        malformed_skipped: int = 0
 
         try:
             with open(self.path, "r", encoding="utf-8") as f:
                 for line in f:
                     line = line.rstrip("\n")
                     m = FAILED_RE.search(line)
-                    if not m:
+                    if m is None:
                         if "Failed password" in line:
                             malformed_skipped += 1
                         continue
-                    ip = m.group(1)
+                    ip: str = m.group(1)
                     try:
                         addr = ipaddress.IPv4Address(ip)
                     except Exception:

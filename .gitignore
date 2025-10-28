@@ -41,7 +41,7 @@ cython_debug/
 .pypirc
 
 # Ignore game files
-*.log
-*.json
-*.cfg
-*.txt
+/*.log
+/*.json
+/*.cfg
+/*.txt
