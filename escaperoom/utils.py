@@ -15,6 +15,8 @@ def parse_kv_file(path: str) -> dict[str, str]:
             line = raw.strip()
             if not line or line.startswith("#") or "=" not in line:
                 continue
+            line = line.split("#", 1)[0]  # discard comments
+            
             k, v = line.split("=", 1)
             kv[k.strip().lower()] = v.strip()
     return kv

@@ -1,5 +1,5 @@
 from escaperoom.transcript import Transcript
-from escaperoom.rooms.base import GameState
+from escaperoom.GameState import GameState
 from escaperoom.rooms.base import Room
 import ipaddress
 import re
@@ -54,7 +54,7 @@ class SocRoom(Room):
             print("[Warning] No failed attempts found.")
             return
 
-        # Top /24 by count; tie-break lexicographically for determinism
+        # Top /24 by count; tie-break lexicographically
         top24, total_in_top24 = sorted(
             subnet_counts.items(), key=lambda kv: (-kv[1], kv[0])
         )[0]

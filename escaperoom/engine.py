@@ -5,7 +5,7 @@ import json
 import os
 from escaperoom.transcript import Transcript
 from escaperoom.rooms.base import Room
-from escaperoom.rooms.base import GameState
+from escaperoom.GameState import GameState
 from escaperoom.utils import parse_kv_file
 
 

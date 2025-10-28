@@ -1,5 +1,5 @@
 from escaperoom.transcript import Transcript
-from escaperoom.rooms.base import GameState
+from escaperoom.GameState import GameState
 from escaperoom.rooms.base import Room
 import os
 import re
