@@ -3,7 +3,7 @@ from tests.TestRegistry import Test
 
 from escaperoom.utils import parse_kv_file
 
-## read_jsonl(path: str) -> list[dict]:
+## parse_kv_file(path: str) -> dict[str, str]:
 
 def test_parse_kv_file(data, expected):
     """Creates a pipe to simulate a file reading scenario"""
