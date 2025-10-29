@@ -3,16 +3,140 @@ from tests.TestRegistry import Test
 
 from escaperoom.utils import parse_kv_file
 
-## parse_kv_file(path: str) -> dict[str, str]:
 
 def test_parse_kv_file(data, expected):
     """Creates a pipe to simulate a file reading scenario"""
     r, w = os.pipe()
     fw = os.fdopen(w, "w")
-    fw.write(data + "\0") #Insert EOF
+    fw.write(data + "\0")  # Insert EOF
     fw.flush()
     fw.close()
 
     # Pass file descriptor to parse_kv_file
-    result = parse_kv_file(r) # type: ignore 
+    result = parse_kv_file(r)  # type: ignore
     return result == expected
+
+
+@Test
+def givenValidKVFile_thenReturnDict():
+    data = """
+    key1=value1
+    key2 = value2
+    key3=value3
+    """
+    expected = {
+        "key1": "value1",
+        "key2": "value2",
+        "key3": "value3",
+    }
+    return test_parse_kv_file(data, expected)
+
+
+@Test
+def givenKVFileWithComments_thenIgnoreComments():
+    data = """
+    # This is a comment
+    key1=value1 # Inline comment
+    key2 = value2
+    # Another comment
+    key3=value3
+    """
+
+    expected = {
+        "key1": "value1",
+        "key2": "value2",
+        "key3": "value3",
+    }
+    return test_parse_kv_file(data, expected)
+
+
+@Test
+def givenKVFileWithEmptyLines_thenIgnoreEmptyLines():
+    data = """
+
+    key1=value1
+
+    key2 = value2
+
+    key3=value3
+
+    """
+    expected = {
+        "key1": "value1",
+        "key2": "value2",
+        "key3": "value3",
+    }
+    return test_parse_kv_file(data, expected)
+
+
+@Test
+def givenKVFileWithInvalidLines_thenIgnoreLines():
+    data = """
+    key1=value1
+    invalid_line
+    key2 = value2
+    another_invalid_line
+    key3=value3
+    """
+    expected = {
+        "key1": "value1",
+        "key2": "value2",
+        "key3": "value3",
+    }
+    return test_parse_kv_file(data, expected)
+
+
+@Test
+def givenRepeatedKeys_thenLastValueWins():
+    data = """
+    key1=value1
+    key2=value2
+    key1=value3
+    key3=value4
+    key2=value5
+    """
+    expected = {
+        "key1": "value3",
+        "key2": "value5",
+        "key3": "value4",
+    }
+    return test_parse_kv_file(data, expected)
+
+
+@Test
+def givenKVFileWithRepeatedEquals_thenSplitAtFirstEquals():
+    data = """
+    key1=value=with=equals
+    key2=another=value
+    key3=simplevalue
+    """
+    expected = {
+        "key1": "value=with=equals",
+        "key2": "another=value",
+        "key3": "simplevalue",
+    }
+    return test_parse_kv_file(data, expected)
+
+
+@Test
+def givenEmptyFile_thenReturnEmptyDict():
+    data = ""
+    expected = {}
+    return test_parse_kv_file(data, expected)
+
+
+@Test
+def givenSpacesAroundKeysAndValues_thenTrimSpaces():
+    data = """
+        key1    =    value1    
+        key2=value2
+        key3    =value3
+        key4=    value4
+    """
+    expected = {
+        "key1": "value1",
+        "key2": "value2",
+        "key3": "value3",
+        "key4": "value4",
+    }
+    return test_parse_kv_file(data, expected)

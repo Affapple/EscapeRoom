@@ -13,9 +13,12 @@ def discover_tests():
             test_files += 1
     print(f"Discovered {len(tests)} tests on {test_files} test files.")
 
+
 if __name__ == "__main__":
     discover_tests()
 
-    print("Running all tests...\n")
-    for test in tests:
-        test()
+    for module in tests.keys():
+        print("Running tests from module:", module)
+        for test_func in tests[module]:
+            test_func()
+        print()
