@@ -66,20 +66,23 @@ class SocRoom(Room):
             print("[Warning] No failed attempts found.")
             return
 
-        # Top /24 by count; tie-break lexicographically
-        top24, total_in_top24 = sorted(
-            subnet_counts.items(), key=lambda kv: (-kv[1], kv[0])
-        )[0]
+        # To find the subnet with the most failed attempts
+        top24: str = ""
+        total_in_top24: int = 0
+        for subnet, count in subnet_counts.items():
+            if count > total_in_top24:
+                top24 = subnet
+                total_in_top24 = count
 
-        # Choose most frequent IP within that /24
+
+        # To find the most frequent IP inside that subnet
+        highest_count = -1
+        top_ip: str = ""
         top_net = ipaddress.IPv4Network(top24, strict=False)
-        top_ip = None
-        best = (-1, "")
-        for ip, cnt in ip_counts.items():
+        for ip, count in ip_counts.items():
             if ipaddress.IPv4Address(ip) in top_net:
-                key = (-cnt, ip)
-                if key < best or top_ip is None:
-                    best = key
+                if count > highest_count:
+                    highest_count = count
                     top_ip = ip
 
         if not top_ip:
