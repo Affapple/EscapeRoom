@@ -23,7 +23,9 @@ def parse_kv_file(path: str) -> dict[str, str]:
             line = line.split("#", 1)[0]  # discard comments
 
             k, v = line.split("=", 1)
-            kv[k.strip()] = v.strip()
+            v = v.strip()
+            if v != "":
+                kv[k.strip()] = v.strip()
     return kv
 
 
@@ -36,9 +38,8 @@ def b64_decode(msg: str) -> str:
     if len(msg) % 4 != 0:
         msg += "=" * (4 - (len(msg) % 4))
     try:
-        return base64.b64decode(msg).decode("utf-8", errors="ignore").strip()
-    except binascii.Error as e:
-        print(f"[Warning] Base64 decoding failed. {e}")
+        return base64.b64decode(msg).decode().strip()
+    except (UnicodeDecodeError, binascii.Error) as e:
         return ""
 
 

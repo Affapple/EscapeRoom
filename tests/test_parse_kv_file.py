@@ -14,7 +14,7 @@ def test_parse_kv_file(data, expected):
 
     # Pass file descriptor to parse_kv_file
     result = parse_kv_file(r)  # type: ignore
-    return result == expected
+    return result, result == expected
 
 
 @Test
@@ -29,7 +29,8 @@ def givenValidKVFile_thenReturnDict():
         "key2": "value2",
         "key3": "value3",
     }
-    return test_parse_kv_file(data, expected)
+    result, passed = test_parse_kv_file(data, expected)
+    return passed
 
 
 @Test
@@ -47,7 +48,9 @@ def givenKVFileWithComments_thenIgnoreComments():
         "key2": "value2",
         "key3": "value3",
     }
-    return test_parse_kv_file(data, expected)
+
+    result, passed = test_parse_kv_file(data, expected)
+    return passed
 
 
 @Test
@@ -66,7 +69,8 @@ def givenKVFileWithEmptyLines_thenIgnoreEmptyLines():
         "key2": "value2",
         "key3": "value3",
     }
-    return test_parse_kv_file(data, expected)
+    result, passed = test_parse_kv_file(data, expected)
+    return passed
 
 
 @Test
@@ -83,7 +87,8 @@ def givenKVFileWithInvalidLines_thenIgnoreLines():
         "key2": "value2",
         "key3": "value3",
     }
-    return test_parse_kv_file(data, expected)
+    result, passed = test_parse_kv_file(data, expected)
+    return passed
 
 
 @Test
@@ -100,7 +105,8 @@ def givenRepeatedKeys_thenLastValueWins():
         "key2": "value5",
         "key3": "value4",
     }
-    return test_parse_kv_file(data, expected)
+    result, passed = test_parse_kv_file(data, expected)
+    return passed
 
 
 @Test
@@ -115,14 +121,16 @@ def givenKVFileWithRepeatedEquals_thenSplitAtFirstEquals():
         "key2": "another=value",
         "key3": "simplevalue",
     }
-    return test_parse_kv_file(data, expected)
+    result, passed = test_parse_kv_file(data, expected)
+    return passed
 
 
 @Test
 def givenEmptyFile_thenReturnEmptyDict():
     data = ""
     expected = {}
-    return test_parse_kv_file(data, expected)
+    result, passed = test_parse_kv_file(data, expected)
+    return passed
 
 
 @Test
@@ -139,4 +147,20 @@ def givenSpacesAroundKeysAndValues_thenTrimSpaces():
         "key3": "value3",
         "key4": "value4",
     }
-    return test_parse_kv_file(data, expected)
+    result, passed = test_parse_kv_file(data, expected)
+    return passed
+
+@Test
+def givenIncompleteLine_thenNoValueAttributed():
+    data = """
+    key1 = value1
+    key2 =   
+    key1 =
+    key3 = value3
+    """
+    expected = {
+        "key1" : "value1",
+        "key3" : "value3"
+    }
+    result, passed = test_parse_kv_file(data, expected)
+    return passed
