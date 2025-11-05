@@ -1,19 +1,31 @@
-from escaperoom.transcript import Transcript
-from escaperoom.GameState import GameState
-from escaperoom.rooms.base import Room
 import ipaddress
 import re
 import os
+
+from escaperoom.transcript import Transcript
+from escaperoom.GameState import GameState
+from escaperoom.rooms.base import Room
 
 FAILED_RE = re.compile(r"Failed password .* from (\d{1,3}(?:\.\d{1,3}){3})")
 
 
 class SocRoom(Room):
+    """
+    Room representing the SOC Triage Desk containing auth.log
+    """
+
     def __init__(self, data_dir: str):
         super().__init__("SOC Triage Desk", "Items here: auth.log")
         self.path = os.path.join(data_dir, "auth.log")
 
     def solve(self, state: GameState, tr: Transcript, item: str = ""):
+        """
+        Analyze auth.log for failed SSH login attempts to determine
+        the most targeted /24 subnet and derive a token from it.
+        :param state: Current game state
+        :param tr: Transcript to log actions
+        :param item: Item to inspect
+        """
         if item.lower() not in ("auth.log", "auth", ""):
             print("Nothing interesting to inspect here.")
             return
@@ -24,50 +36,53 @@ class SocRoom(Room):
         sample_line: str = ""
         malformed_skipped: int = 0
 
-        try:
-            with open(self.path, "r", encoding="utf-8") as f:
-                for line in f:
-                    line = line.rstrip("\n")
-                    m = FAILED_RE.search(line)
-                    if m is None:
-                        if "Failed password" in line:
-                            malformed_skipped += 1
-                        continue
-                    ip: str = m.group(1)
-                    try:
-                        addr = ipaddress.IPv4Address(ip)
-                    except Exception:
-                        malformed_skipped += 1
-                        continue
-
-                    net = ipaddress.IPv4Network(f"{addr}/24", strict=False)
-                    subnet_key = f"{net.network_address}/24"
-                    subnet_counts[subnet_key] = subnet_counts.get(subnet_key, 0) + 1
-                    ip_counts[ip] = ip_counts.get(ip, 0) + 1
-                    if not sample_line:
-                        sample_line = line
-        except FileNotFoundError:
+        if os.path.exists(self.path) or not os.path.isfile(self.path):
             print("[Warning] auth.log not found.")
             return
+
+        with open(self.path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.rstrip("\n")
+                m = FAILED_RE.search(line)
+                if m is None:
+                    if "Failed password" in line:
+                        malformed_skipped += 1
+                    continue
+                ip: str = m.group(1)
+                try:
+                    addr = ipaddress.IPv4Address(ip)
+                except ipaddress.AddressValueError:
+                    malformed_skipped += 1
+                    continue
+
+                net = ipaddress.IPv4Network(f"{addr}/24", strict=False)
+                subnet_key = f"{net.network_address}/24"
+                subnet_counts[subnet_key] = subnet_counts.get(subnet_key, 0) + 1
+                ip_counts[ip] = ip_counts.get(ip, 0) + 1
+                if not sample_line:
+                    sample_line = line
 
         if not subnet_counts:
             print("[Warning] No failed attempts found.")
             return
 
-        # Top /24 by count; tie-break lexicographically
-        top24, total_in_top24 = sorted(
-            subnet_counts.items(), key=lambda kv: (-kv[1], kv[0])
-        )[0]
+        # To find the subnet with the most failed attempts
+        top24: str = ""
+        total_in_top24: int = 0
+        for subnet, count in subnet_counts.items():
+            if count > total_in_top24:
+                top24 = subnet
+                total_in_top24 = count
 
-        # Choose most frequent IP within that /24 precisely (membership check)
+
+        # To find the most frequent IP inside that subnet
+        highest_count = -1
+        top_ip: str = ""
         top_net = ipaddress.IPv4Network(top24, strict=False)
-        top_ip = None
-        best = (-1, "")
-        for ip, cnt in ip_counts.items():
+        for ip, count in ip_counts.items():
             if ipaddress.IPv4Address(ip) in top_net:
-                key = (-cnt, ip)
-                if key < best or top_ip is None:
-                    best = key
+                if count > highest_count:
+                    highest_count = count
                     top_ip = ip
 
         if not top_ip:
@@ -77,12 +92,12 @@ class SocRoom(Room):
         last_octet = top_ip.split(".")[-1]
         token = f"{last_octet}{total_in_top24}"
 
-        tr.write(f"TOKEN[KEYPAD]={token}")
-        tr.write(f"EVIDENCE[KEYPAD].TOP24={top24}")
-        tr.write(f"EVIDENCE[KEYPAD].COUNT={total_in_top24}")
+        tr.token("KEYPAD", token)
+        tr.evidence("KEYPAD", "TOP24", top24)
+        tr.evidence("KEYPAD", "COUNT", str(total_in_top24))
         if sample_line:
-            tr.write(f"EVIDENCE[KEYPAD].SAMPLE={sample_line}")
-        tr.write(f"EVIDENCE[KEYPAD].MALFORMED_SKIPPED={malformed_skipped}")
+            tr.evidence("KEYPAD", "SAMPLE", sample_line)
+        tr.evidence("KEYPAD", "MALFORMED_SKIPPED", str(malformed_skipped))
 
         state.tokens["KEYPAD"] = token
 

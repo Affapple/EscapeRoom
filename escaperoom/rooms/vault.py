@@ -1,8 +1,10 @@
+import os
+import re
+
 from escaperoom.transcript import Transcript
 from escaperoom.GameState import GameState
 from escaperoom.rooms.base import Room
-import os
-import re
+
 
 # S A  F  E {  digits - digits - digits }
 SAFE_RE = re.compile(
@@ -11,11 +13,22 @@ SAFE_RE = re.compile(
 
 
 class VaultRoom(Room):
+    """
+    Room representing the Vault Corridor containing vault_dump.txt
+    """
+
     def __init__(self, data_dir: str):
         super().__init__("Vault Corridor", "Items here: vault_dump.txt")
         self.path: str = os.path.join(data_dir, "vault_dump.txt")
 
     def solve(self, state: GameState, tr: Transcript, item: str = ""):
+        """
+        Analyze vault_dump.txt for SAFE codes of the form SAFE{a-b-c}
+        where a + b = c.
+        :param state: Current game state
+        :param tr: Transcript to log actions
+        :param item: Item to inspect
+        """
         if item.lower() not in ("vault_dump.txt", "vault", ""):
             print("Nothing interesting to inspect here.")
             return
@@ -28,8 +41,9 @@ class VaultRoom(Room):
             print("[Warning] vault_dump.txt not found.")
             return
 
-        a: int; b: int; c: int
-        a = b = c = -1
+        a: int = -1
+        b: int = -1
+        c: int = -1
         found: bool = False
         for m in SAFE_RE.finditer(text):
             a, b, c = map(int, m.groups())

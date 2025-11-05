@@ -1,5 +1,5 @@
 import argparse
-from escaperoom.engine import Engine, Room
+from escaperoom.engine import Engine
 from escaperoom.rooms.soc import SocRoom
 from escaperoom.rooms.dns import DnsRoom
 from escaperoom.rooms.vault import VaultRoom
@@ -9,6 +9,7 @@ from escaperoom.rooms.final import FinalRoom
 
 
 def build_rooms(data_dir: str):
+    """Initialize rooms for the escape room engine."""
     return {
         "intro": IntroRoom(),
         "soc": SocRoom(data_dir),
