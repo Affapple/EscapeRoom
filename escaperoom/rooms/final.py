@@ -16,6 +16,7 @@ class FinalRoom(Room):
     def solve(self, state: GameState, tr: Transcript, item: str = ""):
         """
         Placeholder solve method for the final room, no action needed
+        
         :param state: Current game state
         :param tr: Transcript to log actions
         :param item: Item to inspect

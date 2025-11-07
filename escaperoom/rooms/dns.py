@@ -19,6 +19,7 @@ class DnsRoom(Room):
     def solve(self, state: GameState, tr: Transcript, item: str = ""):
         """
         Solve the DNS room by decoding hints from dns.cfg
+
         :param state: Current game state
         :param tr: Transcript to log actions
         :param item: Item to inspect
@@ -75,6 +76,7 @@ class DnsRoom(Room):
     def rot13(self, text: str) -> str:
         """
         Apply ROT13 cipher to the input text
+
         :param text: Input string
         :return: ROT13 transformed string
         """

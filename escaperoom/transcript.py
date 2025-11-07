@@ -15,6 +15,7 @@ class Transcript:
     def write(self, line: str) -> None:
         """
         Write a single lie to the transcript buffer
+        
         :param line: Line to write
         """
         self._buf.append(line)
@@ -22,6 +23,7 @@ class Transcript:
     def extend(self, lines: Iterable[str]) -> None:
         """
         Write multiple lines to the transcript buffer
+
         :param lines: Iterable object containing lines to write on the buffer
         """
         for ln in lines:
@@ -40,6 +42,7 @@ class Transcript:
     def token(self, kind: str, value: str) -> None:
         """
         Write a token entry to the transcript
+
         :param kind: Token kind
         :param value: Token value
         """
@@ -48,6 +51,7 @@ class Transcript:
     def evidence(self, kind: str, key: str, value: str) -> None:
         """
         Write an evidence entry to the transcript
+
         :param kind: Evidence kind
         :param key: Evidence key
         :param value: Evidence value
@@ -57,6 +61,7 @@ class Transcript:
     def final_gate(self, msg: str, expected_hmac: str) -> None:
         """
         Write the final gate attempt to the transcript
+
         :param msg: Final gate message
         :param expected_hmac: Expected HMAC value
         """

@@ -72,6 +72,7 @@ class Engine:
     def dispatch(self, line: str) -> None:
         """
         Dispatch a command line to the appropriate handler
+        
         :param line: The input command line
         """
         parts = line.split(maxsplit=1)
@@ -86,6 +87,7 @@ class Engine:
     def _current_room_obj(self) -> Optional[Room]:
         """
         Get the current room object
+
         :return: The current Room object
         """
         return self.rooms.get(self.state.current_room)
@@ -103,6 +105,7 @@ class Engine:
     def cmd_help(self, _: str) -> None:
         """
         Display help information on std io
+
         :param _: Unused
         """
         print(
@@ -113,6 +116,7 @@ class Engine:
     def cmd_rooms(self, _: str) -> None:
         """
         List available rooms on the std io
+
         :param _: Unused
         """
         print("Rooms:")
@@ -124,6 +128,7 @@ class Engine:
     def cmd_look(self, _: str) -> None:
         """
         Describe the current room on the std io
+
         :param _: Unused
         """
         room = self._current_room_obj()
@@ -136,6 +141,7 @@ class Engine:
     def cmd_move(self, room_name: str) -> None:
         """
         Move to another room specified by name or number
+
         :param room_name: The room name or number
         """
         token = room_name.strip()
@@ -153,6 +159,7 @@ class Engine:
     def cmd_inspect(self, item: str) -> None:
         """
         Inspect an item in the current room
+
         :param item: The item to inspect
         """
         item = item.strip()
@@ -165,6 +172,7 @@ class Engine:
     def cmd_use(self, item: str) -> None:
         """
         Attemps to use an item in the current room
+
         :param item: The item to use
         """
         tool = item.strip().lower()
@@ -203,6 +211,7 @@ class Engine:
     def cmd_inventory(self, _: str) -> None:
         """
         List the current inventory on the std io
+
         :param _: Unused
         """
         if self.state.tokens:
@@ -214,6 +223,7 @@ class Engine:
     def cmd_hint(self, _: str) -> None:
         """
         Provide a hint for the current room
+
         :param _: Unused
         """
         print("Try 'inspect' the room’s data file to gather evidence.")
@@ -221,6 +231,7 @@ class Engine:
     def cmd_save(self, save_file: str = "save.json") -> None:
         """
         Save the current game state to a file
+
         :param save_file: The file path to save to
         """
         path = save_file.strip()
@@ -236,6 +247,7 @@ class Engine:
     def cmd_load(self, save_file: str = "save.json") -> None:
         """
         Attempts to load a game state from a file
+
         :param save_file: The file path to load from
         """
         path = save_file.strip()

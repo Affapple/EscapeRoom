@@ -9,6 +9,7 @@ B64_CHARS = set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+
 def parse_kv_file(path: str) -> dict[str, str]:
     """
     Parses a simple key=value file; ignores comments and blank lines
+
     :param path: Path to the file
     :return: Dictionary of key-value pairs
     """
@@ -32,6 +33,7 @@ def parse_kv_file(path: str) -> dict[str, str]:
 def b64_decode(msg: str) -> str:
     """
     Decodes a base64-encoded string, adding padding if necessary
+
     :param msg: Base64-encoded string
     :return: Decoded UTF-8 string
     """
@@ -46,6 +48,7 @@ def b64_decode(msg: str) -> str:
 def read_jsonl(path: str) -> list[dict]:
     """
     Parses a JSONL file into a list of dictionaries
+    
     :param path: Path to the JSONL file
     :return: List of dictionaries containing the parsed JSON objects
     """
