@@ -6,7 +6,6 @@ from escaperoom.transcript import Transcript
 from escaperoom.GameState import GameState
 from escaperoom.rooms.base import Room
 
-FAILED_RE = re.compile(r"Failed password .* from (\d{1,3}(?:\.\d{1,3}){3})")
 
 
 class SocRoom(Room):
@@ -18,10 +17,11 @@ class SocRoom(Room):
         super().__init__("SOC Triage Desk", "Items here: auth.log")
         self.path = os.path.join(data_dir, "auth.log")
 
-    def solve(self, state: GameState, tr: Transcript, item: str = ""):
+    def solve(self, state: GameState, tr: Transcript, item: str = "") -> None:
         """
         Analyze auth.log for failed SSH login attempts to determine
         the most targeted /24 subnet and derive a token from it.
+        
         :param state: Current game state
         :param tr: Transcript to log actions
         :param item: Item to inspect
@@ -36,19 +36,24 @@ class SocRoom(Room):
         sample_line: str = ""
         malformed_skipped: int = 0
 
-        if os.path.exists(self.path) or not os.path.isfile(self.path):
+        if not os.path.exists(self.path) or not os.path.isfile(self.path):
             print("[Warning] auth.log not found.")
             return
 
         with open(self.path, "r", encoding="utf-8") as f:
             for line in f:
-                line = line.rstrip("\n")
-                m = FAILED_RE.search(line)
-                if m is None:
-                    if "Failed password" in line:
-                        malformed_skipped += 1
+                line = line.strip()
+                attempt_data = self._get_attempt_data(line)
+                has_missing_data = any(key not in attempt_data for key in ["for", "from", "port", "protocol"])
+                if has_missing_data:
+                    malformed_skipped += 1
                     continue
-                ip: str = m.group(1)
+
+                was_succesful = "Accepted" in attempt_data
+                if was_succesful:
+                    continue
+
+                ip: str = attempt_data["from"]
                 try:
                     addr = ipaddress.IPv4Address(ip)
                 except ipaddress.AddressValueError:
@@ -104,3 +109,28 @@ class SocRoom(Room):
         print(f"{total_in_top24} failed attempts found in {top24}")
         print(f"Top IP is {top_ip} (last octet={last_octet})")
         print(f"Token formed: {token}")
+
+    def _get_attempt_data(self, line: str) -> dict[str, str]:
+        """
+        Transforms the line of a login attempt of auth.log
+        into a key-value pairs specifying
+
+        :param line: A line of the auth.log matching its pattern
+        :return dict: Dictionary with key-value pairs of login data
+        """
+        try:
+            daemon_info, access_data = line.split(": ", 1)
+            daemon_info = daemon_info.strip()
+            access_data = access_data.strip()
+        except ValueError:
+            return {}
+
+        # If ssh info doesnt match pattern DATE LAB SSHD[ID]
+        match = re.match(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|([+-]\d{2}:\d{2}))? .+ sshd\[\d{1,5}\]", daemon_info)
+        if not match:
+            return {}
+        
+        data_iterator = iter(access_data.split())
+        data = dict(zip(data_iterator, data_iterator))
+
+        return data

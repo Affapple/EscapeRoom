@@ -21,10 +21,11 @@ class VaultRoom(Room):
         super().__init__("Vault Corridor", "Items here: vault_dump.txt")
         self.path: str = os.path.join(data_dir, "vault_dump.txt")
 
-    def solve(self, state: GameState, tr: Transcript, item: str = ""):
+    def solve(self, state: GameState, tr: Transcript, item: str = "") -> None:
         """
         Analyze vault_dump.txt for SAFE codes of the form SAFE{a-b-c}
         where a + b = c.
+        
         :param state: Current game state
         :param tr: Transcript to log actions
         :param item: Item to inspect
