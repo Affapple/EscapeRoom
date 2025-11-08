@@ -61,6 +61,8 @@ Finally, only documentation remained, which was done by every member of the grou
 João, as the group leader, besides dividing the task, was also in charge of reviewing in depth all code and logic proposed by the group members.
 All group members were also encouraged to review each others code.
 
+The only contributor on GitHub was João Gaspar, but this does not reflect on the actual work done.
+The main channel of discussion and edits was Discord and in-person meetings, where João promptly updated the repository code. This happened as the other group members were not acquainted with Github and since we didn't understood that contributions to a repository was necessary, this unfortunately never changed throughout the whole project lifecycle since there was a small friction against it which was not addressed in due time.
 
 ## Room Logic
 
@@ -99,7 +101,7 @@ In order to test our solution, we did both manual and automated tests.
 ### Manual tests
 Most tests made were manual, were we tested all commands with several relevant inputs, to guarantee it was considered a good solution, we also solved each room with our program and verified by hand each obtained solution guaranteeing that everything worked as expected.
 This process was repeated with other group's data, ensuring it worked in all provided scenarios. 
-Each tree search algorithm was also tested thoroughly for us to consider it adequate.
+Each tree search algorithm was also tested thoroughly for us to consider it adequately sound.
 
 ### Automatic test
 
@@ -109,6 +111,19 @@ They were made following the paradigm that *given X input, then expect Y output*
 
 #### Test Example
 ```py
+def test_parse_kv_file(data, expected):
+    """Creates a pipe to simulate a file reading scenario"""
+    r, w = os.pipe()
+    fw = os.fdopen(w, "w")
+    fw.write(data + "\0")  # Insert EOF
+    fw.flush()
+    fw.close()
+
+    # Pass file descriptor to parse_kv_file
+    result = parse_kv_file(r)  # type: ignore
+    return result, result == expected
+
+
 @Test
 def givenKVFileWithComments_thenIgnoreComments():
     data = """
