@@ -234,13 +234,16 @@ class Engine:
 
         :param save_file: The file path to save to
         """
-        path = save_file.strip()
+        save_file = save_file.strip() or "save.json"
+        path = os.path.join('./', save_file)
+
         data = asdict(self.state)
         data["inventory"] = list(self.state.inventory)
         try:
-            with open(path, "w", encoding="utf-8") as f:
+            with open(path, "w+", encoding="utf-8") as f:
                 json.dump(data, f, indent=2)
             print("[Game] Progress saved.")
+            self.tr.flush()
         except FileNotFoundError:
             print("[Warning] Save failed, file not found")
 
@@ -250,6 +253,9 @@ class Engine:
 
         :param save_file: The file path to load from
         """
+        save_file = save_file.strip() or "save.json"
+        path = os.path.join('./', save_file)
+
         path = save_file.strip()
         try:
             with open(path, "r", encoding="utf-8") as f:
