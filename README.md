@@ -5,25 +5,25 @@
 ```
 EscapeRoom
 ├── data
-│   ├── auth.log
-│   ├── dns.cfg
-│   ├── final_gate.txt
-│   ├── proc_tree.jsonl
-│   ├── README_DATA.md
-│   └── vault_dump.txt
+│   ├── auth.log
+│   ├── dns.cfg
+│   ├── final_gate.txt
+│   ├── proc_tree.jsonl
+│   ├── README_DATA.md
+│   └── vault_dump.txt
 ├── escaperoom
-│   ├── engine.py
-│   ├── GameState.py
-│   ├── rooms
-│   │   ├── base.py
-│   │   ├── dns.py
-│   │   ├── final.py
-│   │   ├── intro.py
-│   │   ├── malware.py
-│   │   ├── soc.py
-│   │   └── vault.py
-│   ├── transcript.py
-│   └── utils.py
+│   ├── engine.py
+│   ├── GameState.py
+│   ├── rooms
+│   │   ├── base.py
+│   │   ├── dns.py
+│   │   ├── final.py
+│   │   ├── intro.py
+│   │   ├── malware.py
+│   │   ├── soc.py
+│   │   └── vault.py
+│   ├── transcript.py
+│   └── utils.py
 ├── README.md
 ├── escape.py
 │
@@ -52,9 +52,9 @@ Initially, the project was divided into 3 important baseline parts, to create a 
 - Transcript Class (Created by João)
 
 With this baseline defined, we had to analyse each room contents to divide the workload fairly according to both its difficulty and the time needed to complete it.\
-The first room, DNS Room, and Vault Room were both developed by Divya.\
+The first room, SOC Room, and Vault Room were both developed by Divya.\
 The engine, being a bigger task by nature and having the final room logic embedded into it, was still being developed by Eldar, such that only one room was defined to be solved by him: the DNS Room.\
-Finally, Joao had to develop the remaining rooms: Malware, as it was considered the hardest to code, and DNS Room.\
+Finally, Joao had to develop the remaining rooms: Malwareand DNS Room.
 
 Finally, only documentation remained, which was done by every member of the group, following a common baseline structure to ensure consistency.
 
@@ -93,7 +93,7 @@ This detection had three requisites to understand if a proccess was considered m
 - Does it contain a potentially malicious command: scp and curl?
 - If it does, can it extradite data, this is, does in run a post request?
 - If it does, is it a leaf node, as specified in the assignment?
-- 
+
 If all criteria match, then we consider it a malicious command and the tree search ends, returning the path to that node.
 
 
@@ -104,7 +104,7 @@ In order to test our solution, we did both manual and automated tests.
 ### Manual tests
 Most tests made were manual, were we tested all commands with several relevant inputs, to guarantee it was considered a good solution, we also solved each room with our program and verified by hand each obtained solution guaranteeing that everything worked as expected.\
 This process was repeated with other group's data, ensuring it worked in all provided scenarios.\
-Each tree search algorithm was also tested thoroughly for us to consider it adequately sound.\
+Each tree search algorithm was also tested thoroughly for us to consider it adequately sound.
 
 ### Automatic test
 
@@ -156,5 +156,5 @@ We acknowledge the use of AI to:
 
 However, no piece of code written by AI was left to be proof-read/reviewed.
 
-All AI code was also read to thoroughly understand its logic and to guarantee it matched expected logic and functionality.
+All AI code was also read to thoroughly understand its logic and to guarantee it matched expected logic and functionality.\
 Tools used include Claude, ChatGPT, Perplexity, Gemini and Github Copilot.

@@ -42,20 +42,29 @@ class VaultRoom(Room):
             print("[Warning] vault_dump.txt not found.")
             return
 
-        a: int = -1
-        b: int = -1
-        c: int = -1
-        found: bool = False
+        found_codes = []
         for m in SAFE_RE.finditer(text):
-            a, b, c = map(int, m.groups())
+            part1, part2, part3 = m.groups()
+            a = int(part1)
+            b = int(part2)
+            c = int(part3)
+            
+             # Saving (a, b, c) and the raw matched text
+            raw_text = m.group(0)
+            found_codes.append((a, b, c, raw_text))
 
+        # Now keeping only those where a + b = c
+        valid = []
+        for (a, b, c, raw_text) in found_codes:
             if a + b == c:
-                found = True
-                break
+                valid.append((a, b, c, raw_text))
 
-        if not found:
+        if len(valid) == 0:
             print("[Warning] No valid SAFE{a-b-c} where a+b=c found.")
             return
+
+        # Picking the first valid 
+        a, b, c, raw = valid[0]
 
         token = f"{a}-{b}-{c}"
 
